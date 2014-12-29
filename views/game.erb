@@ -1,0 +1,47 @@
+<% if @play_again_button %>
+  <form action='/game' method='get'>
+    <input type='submit' class='btn btn-primary' value='Play Again'/>
+  </form>
+  <% else %>
+    <p>Welcome, <%= session[:name] %>!</p>
+<% end %>
+
+
+<h4>You have <%= calculate_total(session[:player_cards])%>. The Dealer has <%= calculate_total(session[:dealer_cards]) %></h4>
+
+<div class='well'>
+  <h4>Dealer's Cards</h4>
+      <% session[:dealer_cards].each do |card| %>
+        <%= card_image(card) %>
+      <% end %>
+        
+  <% if @show_dealer_button %>
+    <p>
+      <h5>Dealer has <%= session[:dealer_cards] %>. Dealer hits...</h5>
+        <form action='/game/dealer/hit' method='post'>
+          <input type='submit' class='btn btn-primary btn-large' value='See next card &rarr;'/>
+        </form>
+    </p>
+  <% end %>
+</div>
+<div class=well>
+  <h4>Player's Cards</h4>
+    <% session[:player_cards].each do |card| %>
+      <%= card_image(card) %>
+    <% end %>
+</div>
+
+<% if @hit_stay_buttons %>
+  <h4>Do you want to hit or stay?</h4>
+  <p>
+    <form id="hit_form" action='/game/player/hit' method='post'>
+      <input type='submit' class='btn btn-warning btn-large' value='Hit'/>
+    </form>
+    <form id="stay_form" action=/game/player/stay method=post>
+      <input type=submit class='btn btn-primary btn-large' value=Stay />
+    </form>
+  </p>
+<% end %>
+
+
+

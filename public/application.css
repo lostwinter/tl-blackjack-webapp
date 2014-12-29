@@ -1,0 +1,20 @@
+#hit_form {
+  float: left; 
+  margin-right: 10px;
+}
+
+#stay_form {
+    float: right;
+}
+
+
+.navbar {
+    background-color: black;
+}
+.image_spacing {
+    margin-right: 10px;
+}
+
+.nav-float {
+    float: right;
+}
