@@ -6,19 +6,15 @@
     <link rel="stylesheet" href="/application.css">
   </head>
   <body style="padding-top: 50px;">
-    <div class="navbar navbar-fixed-top ">
-     <div class="navbar-inner">
+   <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
         <div class="container">
-          <h1>Blackjack</h1>
-          <div class="navbar-header">
-          
-            <ul class="nav navbar-nav nav-float">
+            <ul class="nav">
               <li><a href="/new_game">Start Over</a></li>
             </ul>
-          </div>
         </div>
       </div>
-   </div>
+    </div>
   <div class="container">
     <%if @error %>
       <div class="alert alert-error"><%=@error%></div>

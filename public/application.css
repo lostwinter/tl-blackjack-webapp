@@ -7,7 +7,9 @@
     float: right;
 }
 
-
+#nav-title {
+    color: #ffffff;
+}
 .navbar {
     background-color: black;
 }

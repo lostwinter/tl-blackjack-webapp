@@ -7,7 +7,7 @@
 <% end %>
 
 
-<h4>You have <%= calculate_total(session[:player_cards])%>. The Dealer has <%= calculate_total(session[:dealer_cards]) %></h4>
+<h4>You have <%= calculate_total(session[:player_cards])%>. The Dealer has <%= calculate_total(session[:dealer_cards]) %>.</h4>
 
 <div class='well'>
   <h4>Dealer's Cards</h4>
@@ -17,7 +17,7 @@
         
   <% if @show_dealer_button %>
     <p>
-      <h5>Dealer has <%= session[:dealer_cards] %>. Dealer hits...</h5>
+      <h5>Dealer has <%= calculate_total(session[:dealer_cards]) %>. Dealer hits...</h5>
         <form action='/game/dealer/hit' method='post'>
           <input type='submit' class='btn btn-primary btn-large' value='See next card &rarr;'/>
         </form>
