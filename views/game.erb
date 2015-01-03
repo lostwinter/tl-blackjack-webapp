@@ -1,31 +1,52 @@
+<div id='game'>
+<%if @loser %>
+  <div class="alert alert-error"><%=@winner%></div>
+<% end %>
+<%if @winner %>
+  <div class="alert alert-success"><%=@loser%></div>
+<% end %>
+
 <% if @play_again_button %>
-  <form action='/game' method='get'>
-    <input type='submit' class='btn btn-primary' value='Play Again'/>
-  </form>
+  <p>
+    <strong>Play again? </strong>  
+    <a href='/bet' class='btn btn-primary'>Yes</a>
+    <a href='/new_game' class='btn'>No</a>
+  </p>
   <% else %>
     <p>Welcome, <%= session[:name] %>!</p>
+    <h4>Current holdings: $<%= session[:player_earnings] %>. Current bet: $<%= session[:bet] %></h4>
 <% end %>
 
 
-<h4>You have <%= calculate_total(session[:player_cards])%>. The Dealer has <%= calculate_total(session[:dealer_cards]) %>.</h4>
+
 
 <div class='well'>
+  <% if session[:turn] == session[:name] %>
   <h4>Dealer's Cards</h4>
-      <% session[:dealer_cards].each do |card| %>
+  <% else %>
+  <h4>Dealer's Cards: Total is <%= calculate_total(session[:dealer_cards]) %></h4>
+  <% end %>
+  
+      <% session[:dealer_cards].each_with_index do |card, i| %>
+        <% if session[:turn] == session[:name] && i == 0   %>
+          <img src="/images/cards/cover.jpg"> 
+          <% else %>
         <%= card_image(card) %>
       <% end %>
+    <% end %>
+      
         
   <% if @show_dealer_button %>
     <p>
-      <h5>Dealer has <%= calculate_total(session[:dealer_cards]) %>. Dealer hits...</h5>
-        <form action='/game/dealer/hit' method='post'>
+      <h4>Dealer hits...</h4>
+        <form id='dealer_' action='/game/dealer/hit' method='post'>
           <input type='submit' class='btn btn-primary btn-large' value='See next card &rarr;'/>
         </form>
     </p>
   <% end %>
 </div>
-<div class=well>
-  <h4>Player's Cards</h4>
+<div class='well' id='player_well'>
+  <h4>Player's Cards: Total is <%= calculate_total(session[:player_cards])%></h4>
     <% session[:player_cards].each do |card| %>
       <%= card_image(card) %>
     <% end %>
@@ -42,6 +63,6 @@
     </form>
   </p>
 <% end %>
-
+</div>
 
 

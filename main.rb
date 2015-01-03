@@ -35,13 +35,32 @@ def card_image(card)
   value = card[1].downcase
   "<img src='/images/cards/#{suit}_#{value}.jpg' class='image_spacing'>"
 end
+
+def win_tie!(msg)
+  @winner = "<strong>#{msg}</strong>"
+  @play_again_button = true
+  @hit_stay_buttons = false
+  session[:player_earnings] += session[:bet]
+end
+
+def lose!(msg)
+  @loser = "<strong>#{msg}</strong>"
+  @play_again_button = true
+  @hit_stay_buttons = false
+  session[:player_earnings] -= session[:bet]
+end
+
  
 before do
   @hit_stay_buttons = true
   @show_dealer_button = false
   @play_again_button = false
+  @bet_option = false
 end
 end
+
+BLACKJACK = 21
+INITIAL_POT_AMOUNT = 500
 
 # ROUTES #################################################
 get '/' do
@@ -61,16 +80,28 @@ post '/new_game' do
       @error = "Please give your name."
       halt erb(:new_game)
   end
-  session[:name] = params[:name]
-  redirect '/game'
+  session[:name] = params[:name].capitalize
+  session[:player_earnings] = 500
+  redirect '/bet'
 end
 
 get '/bet' do
-  erb :bet    
+  session[:bet] = nil
+  erb :bet
 end
 
 post '/bet' do
- session[:bet] = params[:bet] 
+  if params[:bet].nil? || params[:bet].to_i == 0
+    @error = "Please offer a valid bet!"
+    halt erb(:bet)
+  elsif params[:bet].to_i > session[:player_earnings]
+    @error = "You can't bet what you don't have, silly."
+    halt erb(:bet)
+  else
+    session[:bet] = params[:bet].to_i 
+  end
+ 
+ redirect '/game'
 end
 
 get '/game' do
@@ -78,6 +109,7 @@ get '/game' do
   suits = %w[Hearts Diamonds Spades Clubs]
   values = %w[2 3 4 5 6 7 8 9 10 Jack Queen King Ace]
   session[:deck] = suits.product(values).shuffle
+  session[:turn] = session[:name]
   
   session[:player_cards] = []
   session[:dealer_cards] = []
@@ -85,26 +117,24 @@ get '/game' do
   session[:player_cards] << session[:deck].pop
   session[:dealer_cards] << session[:deck].pop
   session[:player_cards] << session[:deck].pop
-  if calculate_total(session[:player_cards]) == 21
-    @success = "You hit blackjack!"
-    @hit_stay_buttons = false
-    @play_again_button = true
+  if calculate_total(session[:player_cards]) == BLACKJACK
+    win_tie!("You hit blackjack. You win!")
+  elsif calculate_total(session[:player_cards]) == BLACKJACK
+    lose!("Dealer hits blackjack. You lose")
   end
+  @bet_option = true
   erb :game
 end
 
+
 post '/game/player/hit' do
   session[:player_cards] << session[:deck].pop
-  if calculate_total(session[:player_cards]) > 21
-    @error = "You busted, Fool! Bummer."
-    @hit_stay_buttons = false
-    @play_again_button = true
-  elsif calculate_total(session[:player_cards]) == 21
-    @success = "You hit blackjack!"
-    @hit_stay_buttons = false
-    @play_again_button = true
+  if calculate_total(session[:player_cards]) > BLACKJACK
+    lose!("You busted, Fool! Bummer.")
+  elsif calculate_total(session[:player_cards]) == BLACKJACK
+    win_tie!("You hit blackjack!")
   end
-  erb :game
+  erb :game, layout: false
 end
 
 post '/game/player/stay' do
@@ -115,15 +145,14 @@ end
 
 get '/game/dealer' do
   @hit_stay_buttons = false
+  session[:turn] = session[:dealer]
   
   total = calculate_total(session[:dealer_cards])
   
-  if total == 21
-    @error = "Dealer hits blackjack! You lose."
-    @play_again_button = true
-  elsif total > 21
-    @success = "Dealer busts. You win!"
-    @play_again_button = true
+  if total == BLACKJACK
+    lose!("Dealer hits blackjack! You lose.")
+  elsif total > BLACKJACK
+    win_tie!("Dealer busts. You win!")
   elsif total >= 17
     #dealer stays
     redirect '/game/compare'
@@ -131,7 +160,7 @@ get '/game/dealer' do
     @show_dealer_button = true
     
   end
-  erb :game
+  erb :game, layout: false  
 end
 
 post '/game/dealer/hit' do
@@ -146,16 +175,13 @@ get '/game/compare' do
   dealer_total = calculate_total(session[:dealer_cards])
   
   if player_total == dealer_total
-    @success = "You are tied. Push!"
-    @play_again_button = true
+    win_tie!("You are tied. Push!")
   elsif player_total > dealer_total
-    @success = "You win!"
-    @play_again_button = true
+    win_tie!("You win!")
   else
-    @error = "Dealer wins. You lose."
-    @play_again_button = true
+    lose!("Dealer wins. You lose.")
   end
-  erb :game  
+  erb :game, layout: false  
 end
 
 
