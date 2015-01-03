@@ -1,9 +1,8 @@
 <div id='game'>
 <%if @loser %>
-  <div class="alert alert-error"><%=@winner%></div>
-<% end %>
-<%if @winner %>
-  <div class="alert alert-success"><%=@loser%></div>
+  <div class="alert alert-error"><%=@loser%></div>
+<%elsif @winner %>
+  <div class="alert alert-success"><%=@winner%></div>
 <% end %>
 
 <% if @play_again_button %>
@@ -39,7 +38,7 @@
   <% if @show_dealer_button %>
     <p>
       <h4>Dealer hits...</h4>
-        <form id='dealer_' action='/game/dealer/hit' method='post'>
+        <form id='dealer_hit' action='/game/dealer/hit' method='post'>
           <input type='submit' class='btn btn-primary btn-large' value='See next card &rarr;'/>
         </form>
     </p>

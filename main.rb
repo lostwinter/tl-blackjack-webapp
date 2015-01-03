@@ -12,51 +12,56 @@ end
 
 # HELPERS #####################################
 helpers do
-def calculate_total(cards)
-  array = cards.map {|e| e[1] }
-  total = 0
-  array.each do |a|
-    if a == 'Ace' 
-      total += 11
-    else
-      total += a.to_i == 0 ? 10 : a.to_i
+  def calculate_total(cards)
+    array = cards.map {|e| e[1] }
+    total = 0
+    array.each do |a|
+      if a == 'Ace' 
+        total += 11
+      else
+        total += a.to_i == 0 ? 10 : a.to_i
+      end
     end
+     
+    array.select {|e| e == 'Ace'}.count.times do
+      break if total <= 21
+        total -= 10
+      end
+    total
   end
-   
-  array.select {|e| e == 'Ace'}.count.times do
-    break if total <= 21
-      total -= 10
-    end
-  total
+  
+  def card_image(card)
+    suit = card[0].downcase 
+    value = card[1].downcase
+    "<img src='/images/cards/#{suit}_#{value}.jpg' class='image_spacing'>"
+  end
+  
+  def win!(msg)
+    @play_again_button = true
+    @hit_stay_buttons = false
+    session[:player_earnings] += session[:bet]
+    @winner = "<strong>#{session[:name]} wins!</strong> #{msg}"
+  end
+  
+  def lose!(msg)
+    @play_again_button = true
+    @hit_stay_buttons = false
+    session[:player_earnings] -= session[:bet]
+    @loser = "<strong>#{session[:name]} loses.</strong> #{msg}"
+  end
+  
+  def tie!(msg)
+    @play_again_button = true
+    @hit_stay_buttons = false
+    @winner = "<strong>#{msg}</strong>"
+  end
 end
-
-def card_image(card)
-  suit = card[0].downcase 
-  value = card[1].downcase
-  "<img src='/images/cards/#{suit}_#{value}.jpg' class='image_spacing'>"
-end
-
-def win_tie!(msg)
-  @winner = "<strong>#{msg}</strong>"
-  @play_again_button = true
-  @hit_stay_buttons = false
-  session[:player_earnings] += session[:bet]
-end
-
-def lose!(msg)
-  @loser = "<strong>#{msg}</strong>"
-  @play_again_button = true
-  @hit_stay_buttons = false
-  session[:player_earnings] -= session[:bet]
-end
-
  
 before do
   @hit_stay_buttons = true
   @show_dealer_button = false
   @play_again_button = false
   @bet_option = false
-end
 end
 
 BLACKJACK = 21
@@ -81,7 +86,7 @@ post '/new_game' do
       halt erb(:new_game)
   end
   session[:name] = params[:name].capitalize
-  session[:player_earnings] = 500
+  session[:player_earnings] = INITIAL_POT_AMOUNT
   redirect '/bet'
 end
 
