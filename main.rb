@@ -170,7 +170,7 @@ end
 
 post '/game/dealer/hit' do
   session[:dealer_cards] << session[:deck].pop
-  redirect 'game/dealer'
+  redirect '/game/dealer'
 end
 
 
