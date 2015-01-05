@@ -131,13 +131,12 @@ get '/game' do
   erb :game
 end
 
-
 post '/game/player/hit' do
   session[:player_cards] << session[:deck].pop
   if calculate_total(session[:player_cards]) > BLACKJACK
     lose!("You busted, Fool! Bummer.")
   elsif calculate_total(session[:player_cards]) == BLACKJACK
-    win_tie!("You hit blackjack!")
+    win!("You hit blackjack!")
   end
   erb :game, layout: false
 end
@@ -157,7 +156,7 @@ get '/game/dealer' do
   if total == BLACKJACK
     lose!("Dealer hits blackjack! You lose.")
   elsif total > BLACKJACK
-    win_tie!("Dealer busts. You win!")
+    win!("Dealer busts. You win!")
   elsif total >= 17
     #dealer stays
     redirect '/game/compare'
@@ -182,7 +181,7 @@ get '/game/compare' do
   if player_total == dealer_total
     win_tie!("You are tied. Push!")
   elsif player_total > dealer_total
-    win_tie!("You win!")
+    win!("You win!")
   else
     lose!("Dealer wins. You lose.")
   end
