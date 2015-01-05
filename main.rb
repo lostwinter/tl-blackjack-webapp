@@ -92,6 +92,9 @@ end
 
 get '/bet' do
   session[:bet] = nil
+  if session[:player_earnings] <= 0
+    redirect '/new_game'
+  end
   erb :bet
 end
 
